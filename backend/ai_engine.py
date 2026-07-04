@@ -7,6 +7,10 @@ def process_receipt_mock(file_name: str, file_content: bytes):
     In a real app, we would use Gemini Vision or Tesseract here.
     """
     
+    # Access global settings
+    global USER_SETTINGS
+    auto_approval_limit = USER_SETTINGS.get("auto_approval_limit", 10000)
+    
     # Mock Indian vendors
     vendors = [
         "IRCTC (Indian Railways)", 
@@ -50,9 +54,9 @@ def process_receipt_mock(file_name: str, file_content: bytes):
     status = "Approved"
     flags = []
     
-    if total_amount > 10000:
+    if total_amount > auto_approval_limit:
         status = "Manual Review"
-        flags.append("Amount exceeds ₹10,000 auto-approval limit")
+        flags.append(f"Amount exceeds ₹{auto_approval_limit} auto-approval limit")
         
     if category == "Meals" and total_amount > 3000:
         status = "Manual Review"
@@ -91,3 +95,19 @@ def get_mock_analytics():
             "Internet/Comm": 1500.00
         }
     }
+
+# Mock settings state
+USER_SETTINGS = {
+    "name": "Shivani Mishra",
+    "email": "shivani@example.com",
+    "auto_approval_limit": 10000,
+    "currency": "INR"
+}
+
+def get_settings():
+    return USER_SETTINGS
+
+def update_settings(new_settings: dict):
+    global USER_SETTINGS
+    USER_SETTINGS.update(new_settings)
+    return USER_SETTINGS

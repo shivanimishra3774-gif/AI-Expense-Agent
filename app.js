@@ -26,13 +26,15 @@ function switchView(viewName) {
     const titles = {
         'dashboard': 'Dashboard',
         'upload': 'Upload Receipt',
-        'analytics': 'Analytics & Insights'
+        'analytics': 'Analytics & Insights',
+        'settings': 'Settings'
     };
     document.getElementById('page-title').innerText = titles[viewName];
 
     // Load data based on view
     if (viewName === 'dashboard') loadDashboardData();
     if (viewName === 'analytics') loadAnalyticsData();
+    if (viewName === 'settings') loadSettingsData();
 }
 
 // Format status badge
@@ -147,9 +149,12 @@ function displayResults(data) {
     
     // Status
     const statusEl = document.getElementById('res-status');
-    statusEl.outerHTML = getStatusBadge(data.status);
-    // Because outerHTML replaces the element, we need to assign it an ID again to be safe if we reset
-    // Actually better to just set className and innerHTML. Let's fix that pattern for robustness.
+    let badgeClass = 'badge ';
+    if (data.status === 'Approved') badgeClass += 'approved';
+    else if (data.status === 'Manual Review') badgeClass += 'review';
+    else badgeClass += 'rejected';
+    statusEl.className = badgeClass;
+    statusEl.innerText = data.status;
     
     // Flags
     const flagsContainer = document.getElementById('res-flags-container');
@@ -208,6 +213,59 @@ async function loadAnalyticsData() {
         });
     } catch (e) {
         console.error("Chart error", e);
+    }
+}
+
+// Settings Logic
+async function loadSettingsData() {
+    try {
+        const response = await fetch(`${API_BASE}/settings`);
+        const data = await response.json();
+        
+        document.getElementById('set-name').value = data.name || '';
+        document.getElementById('set-email').value = data.email || '';
+        document.getElementById('set-limit').value = data.auto_approval_limit || 10000;
+        document.getElementById('set-currency').value = data.currency || 'INR';
+    } catch (e) {
+        console.error("Error loading settings:", e);
+    }
+}
+
+async function saveSettings(event) {
+    event.preventDefault();
+    
+    const settingsData = {
+        name: document.getElementById('set-name').value,
+        email: document.getElementById('set-email').value,
+        auto_approval_limit: parseInt(document.getElementById('set-limit').value),
+        currency: document.getElementById('set-currency').value
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/settings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settingsData)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            const msgEl = document.getElementById('settings-msg');
+            msgEl.style.display = 'block';
+            setTimeout(() => {
+                msgEl.style.display = 'none';
+            }, 3000);
+            
+            // Update user name in header
+            document.querySelector('.user-name').innerText = settingsData.name;
+            const initials = settingsData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.querySelector('.avatar').innerText = initials.substring(0, 2);
+        }
+    } catch (e) {
+        console.error("Error saving settings:", e);
+        alert("Failed to save settings.");
     }
 }
 

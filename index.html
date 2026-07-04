@@ -19,7 +19,7 @@
             <li class="nav-item active" onclick="switchView('dashboard')">Dashboard</li>
             <li class="nav-item" onclick="switchView('upload')">Upload Receipt</li>
             <li class="nav-item" onclick="switchView('analytics')">Analytics</li>
-            <li class="nav-item">Settings</li>
+            <li class="nav-item" onclick="switchView('settings')">Settings</li>
         </ul>
     </div>
 
@@ -141,6 +141,37 @@
                         <li><strong>98%</strong> of your expenses were automatically approved by the AI policy engine, saving the finance team approx. 4.5 hours of manual review.</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="view-settings" class="view-section" style="display: none;">
+            <div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+                <div class="card-title">User Settings</div>
+                <form id="settings-form" onsubmit="saveSettings(event)">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Full Name</label>
+                        <input type="text" id="set-name" style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white;" required>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Email Address</label>
+                        <input type="email" id="set-email" style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white;" required>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Auto-Approval Limit (INR)</label>
+                        <input type="number" id="set-limit" style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white;" required>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Currency</label>
+                        <select id="set-currency" style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white;">
+                            <option value="INR" style="color: black;">INR (₹)</option>
+                            <option value="USD" style="color: black;">USD ($)</option>
+                            <option value="EUR" style="color: black;">EUR (€)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="upload-btn" style="width: 100%;">Save Settings</button>
+                    <div id="settings-msg" style="margin-top: 1rem; text-align: center; color: var(--success); display: none;">Settings saved successfully!</div>
+                </form>
             </div>
         </div>
 

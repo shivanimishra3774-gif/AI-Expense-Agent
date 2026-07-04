@@ -1,7 +1,15 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from ai_engine import process_receipt_mock, get_mock_history, get_mock_analytics
+from ai_engine import process_receipt_mock, get_mock_history, get_mock_analytics, get_settings, update_settings
+from pydantic import BaseModel
 import uuid
+
+class SettingsUpdate(BaseModel):
+    name: str | None = None
+    email: str | None = None
+    auto_approval_limit: int | None = None
+    currency: str | None = None
+
 
 app = FastAPI(title="AI Expense Management Agent API")
 
@@ -49,3 +57,18 @@ def get_analytics():
     Returns analytics summary data.
     """
     return get_mock_analytics()
+
+@app.get("/api/settings")
+def read_settings():
+    """
+    Returns the current user settings.
+    """
+    return get_settings()
+
+@app.post("/api/settings")
+def update_settings_api(settings: SettingsUpdate):
+    """
+    Updates user settings.
+    """
+    updated = update_settings(settings.dict(exclude_unset=True))
+    return {"success": True, "settings": updated}
